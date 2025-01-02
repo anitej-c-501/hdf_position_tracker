@@ -16,7 +16,6 @@ def main():
     parser.add_argument("input_folder", help="Path to the folder containing input HDF5 files.")
     parser.add_argument("output_folder", help="Path to the folder where output CSV files will be saved.")
 
-    # Parse the arguments
     args = parser.parse_args()
 
     # Resolve paths to absolute paths
@@ -26,7 +25,6 @@ def main():
     print(f"Input Folder: {input_folder}")
     print(f"Output Folder: {output_folder}")
 
-    # Process the data
     try:
         process_data(input_folder, output_folder)
         print("Processing completed successfully.")

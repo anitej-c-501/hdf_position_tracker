@@ -22,14 +22,12 @@ def process_hdf5_file(file_path):
             device_group = hdf_file[device]
             print(device_group)
             print("Checkpoint 2")
-            # Ensure "Position" dataset exists
             if "Position" not in device_group:
                 print(f"Warning: Skipping device '{device}' in file '{file_path}' (no 'Position' data).")
                 continue
             print("Checkpoint 3")
             position_data = device_group["Position"][:]
 
-            # Ensure data has the expected shape
             if not isinstance(position_data, np.ndarray):
                 raise ValueError(f"'Position' data in device '{device}' is not a NumPy array.")
 
@@ -39,7 +37,6 @@ def process_hdf5_file(file_path):
             for sensor_index in range(position_data.shape[1]):
                 sensor_data = position_data[:, sensor_index, :]
 
-                # Ensure sensor_data is a valid array
                 if sensor_data.size == 0:
                     print(f"Warning: Sensor {sensor_index} in device '{device}' has no data.")
                     continue
@@ -109,8 +106,6 @@ def process_data(input_folder, output_folder):
             # Convert `sensors` to a regular Python list if it's a NumPy array
             if isinstance(sensors, np.ndarray):
                 sensors = sensors.tolist()
-
-            # Map results to global identifiers
             avg_position_row = [file_name]
             max_distance_row = [file_name]
 
@@ -118,11 +113,9 @@ def process_data(input_folder, output_folder):
                 if sensor in sensors:
                     sensor_index = sensors.index(sensor)
                     try:
-                        # Add average position values
                         avg_position_row.extend(
                             [float(avg_positions[sensor_index * 3 + i]) for i in range(3)]
                         )
-                        # Add max distance value
                         max_distance_row.append(float(max_distances[sensor_index]))
                     except (IndexError, ValueError) as e:
                         print(f"Error processing sensor '{sensor}' in file '{file_name}': {e}")
@@ -140,13 +133,11 @@ def process_data(input_folder, output_folder):
         except Exception as e:
             print(f"Warning: Skipping file '{file_name}' due to error: {e}")
 
-    # Generate headers
     avg_position_headers = ["File Name"] + [
         f"{sensor}_{axis}" for sensor in all_sensor_identifiers for axis in ["X", "Y", "Z"]
     ]
     max_distance_headers = ["File Name"] + all_sensor_identifiers
 
-    # Write CSVs
     write_csv(os.path.join(output_folder, "average_positions.csv"), avg_position_headers, avg_position_rows)
     write_csv(os.path.join(output_folder, "max_distances.csv"), max_distance_headers, max_distance_rows)
 
